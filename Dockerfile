@@ -1,4 +1,6 @@
-FROM nginx:alpine
+FROM nginx
 
 
-COPY . /usr/share/nginx/html
+COPY /scr/index.html /usr/share/nginx/html
+
+EXPOSE 80
