@@ -1,9 +1,6 @@
 version: 0.2
 
 phases:
-    install:
-        commands:
-             #- pip3 install -q awscli --upgrade --user
     pre_build:
         commands:
             ### Login to Amazon ECR
