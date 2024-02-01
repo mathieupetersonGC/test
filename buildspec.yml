@@ -21,5 +21,5 @@ phases:
         commands:
             ### Publish the docker images to ECR
             - echo Pushing the Docker images...
-            - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:123456
-            - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+            - docker push $IMAGE_REPO_NAME:123456
+            - docker push $IMAGE_REPO_NAME:latest
