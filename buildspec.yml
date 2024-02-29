@@ -6,19 +6,21 @@ phases:
             ### Login to Amazon ECR
              - echo Logging in to Amazon ECR...
              - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+             - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
+             - IMAGE_URI="${REPOSITORY_URI}:${TAG}"
+             - IMAGE_LATEST="${REPOSITORY_URI}:latest"
     build:
         commands:
             ### Building the image 
              - echo Build started on `date`
-             - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest .
+             - docker build -t $IMAGE_URI -t $IMAGE_LATEST .
              - echo Build completed on `date`
     post_build:
         commands:
             ### Publish the docker images to ECR
             - echo Pushing the Docker images...
-            - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
-            - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
-            - printf '{"AWSEBDockerrunVersion":"1","Image":{"Name":"%s","Update":"true"},"Ports":[{"ContainerPort":80,"HostPort":80}]}' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest > Dockerrun.aws.json
-            - cat Dockerrun.aws.json
+            - docker push $IMAGE_URI
+            - docker push $IMAGE_LATEST
+            - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$IMAGE_URI" > images.json
 artifacts:
-  files: Dockerrun.aws.json
+  files: images.json
